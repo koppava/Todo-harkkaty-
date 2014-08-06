@@ -17,7 +17,9 @@
     <script>
     $(function(){
         
-        $.get('index.php', {}, )
+        $.getJSON('index.php', function(data){
+            console.log(data);
+        });
         
         $('table').tablesorter({
                 usNumberFormat : false,
