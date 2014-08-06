@@ -3,6 +3,8 @@
 
 <html>
 <head>
+    <link rel="stylesheet" href="styles.css">
+    
     <script src="http://code.jquery.com/jquery.js"></script>
     
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -13,17 +15,6 @@
     <script src="scripts/tablesorter/jquery.tablesorter.js"></script>
     
     <script src="scripts/jsviews.js"></script>
-    
-    <script>
-    $(function(){
-        
-        $('table').tablesorter({
-                usNumberFormat : false,
-                sortReset      : true,
-                sortRestart    : true
-        });
-    });
-    </script>
 </head>
 <body>
 
@@ -31,7 +22,11 @@
 
 <script id="theTmpl" type="text/x-jsrender">
 {{for tasks}}
-    <tr><td>{{:taskName}}</td><td>{{:assignee}}</td><td>{{:deadline}}</td><td>{{:done}}</td></tr>
+    <tr>
+        <td>{{:taskName}}</td>\n\
+        <td>{{:assignee}}</td>\n\
+        <td>{{:deadline}}</td>\n\
+        <td>{{if done == 1}}<span class="green">Done</span>{{else}}<span class="red">Unfinished</span>{{/if}}</td></tr>
 {{/for}}
 </script>
 
@@ -39,6 +34,12 @@
     $.getJSON('index.php', function(data){
         var template = $.templates("#theTmpl");
         template.link("#todo-table-content", data);
+        
+        $('table').tablesorter({
+                usNumberFormat : false,
+                sortReset      : true,
+                sortRestart    : true
+        });
     });
 </script>
 
