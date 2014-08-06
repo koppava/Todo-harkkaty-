@@ -50,7 +50,7 @@ class Service
     {
         $this->dbAdapter = new DbAdapter();
     }
-    
+
     public function getAll()
     {
         return $this->dummyData;
