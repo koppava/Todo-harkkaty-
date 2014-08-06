@@ -20,7 +20,7 @@
 <body>
 
 <div id="result"></div>
-
+    
 <script id="theTmpl" type="text/x-jsrender">
 {{for tasks}}
     <tr>
@@ -47,7 +47,7 @@
                 <input id="assignee" class="col-xs-5" type="text" />
                 <label for="deadline" class="col-xs-6">Deadline:</label>
                 <input id="deadline" class="col-xs-5" type="text" />
-                <button class="btn btn-primary pull-right">Save</button>
+                <button class="save btn btn-primary pull-right">Save</button>
             </div>
         </div>
     </div>
@@ -69,10 +69,10 @@
 </table>
 
 <script>
-    $.getJSON('index.php', function(data){
-        var template = $.templates("#theTmpl");
-        template.link("#todo-table-content", data);
+    var template = $.templates("#theTmpl");
         
+    $.getJSON('index.php', function(data){
+        $('#todo-table-content').html(template.render(data));
         $('table').tablesorter({
                 usNumberFormat : false,
                 sortReset      : true,
@@ -80,8 +80,24 @@
         });
     });
     
-    $('.add-todo').on('click', function() {
-        console.log('Adding new ToDo item');
+    $('.save').on('click', function() {
+        $.post(
+            'index.php', 
+            {
+                'task-name': $('#task-name').val(),
+                'assignee': $('#assignee').val(),
+                'deadline': $('#deadline').val()
+            },
+            function (data) {
+                $('#todo-table-content').html(template.render(data));
+                
+                $('.modal').modal('hide');
+                $('#task-name').val('');
+                $('#assignee').val('');
+                $('#deadline').val('');
+            },
+            'json'
+        );
     });
     
 </script>
