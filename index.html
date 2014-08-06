@@ -24,7 +24,7 @@
 <script id="theTmpl" type="text/x-jsrender">
 {{for tasks}}
     <tr>
-        <td>{{:taskName}}</td>\n\
+        <td>{{:task_name}}</td>\n\
         <td>{{:assignee}}</td>\n\
         <td>{{:deadline}}</td>\n\
         <td>{{if done == 1}}<span class="green">Done</span>{{else}}<span class="red">Unfinished</span>{{/if}}</td>
@@ -84,12 +84,13 @@
         $.post(
             'index.php', 
             {
-                'task-name': $('#task-name').val(),
+                'task_name': $('#task-name').val(),
                 'assignee': $('#assignee').val(),
                 'deadline': $('#deadline').val()
             },
             function (data) {
                 $('#todo-table-content').html(template.render(data));
+                $('#todo-table-content').trigger('update');
                 
                 $('.modal').modal('hide');
                 $('#task-name').val('');

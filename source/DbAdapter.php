@@ -15,4 +15,22 @@ class DbAdapter extends PDO
 
         parent::__construct($dsn, $username, $password, $options);
     }
+    
+    public function insertTodo($data)
+    {
+        $statement = $this->prepare('INSERT INTO task (task_name, assignee, deadline, done)'
+                . ' VALUES (:task_name, :assignee, :deadline, :done);');
+        $statement->bindParam(':task_name', $data['task_name']);
+        $statement->bindParam(':assignee', $data['assignee']);
+        $statement->bindParam(':deadline', $data['deadline']->format('Y-m-d'));
+        $statement->bindParam(':done', $data['done']);
+        $statement->execute();
+    }
+    
+    public function fetchAll()
+    {
+        $statement = $this->prepare("SELECT * FROM task;");
+        $statement->execute();
+        return $statement->fetchAll();
+    }
 }
