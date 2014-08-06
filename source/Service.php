@@ -1,7 +1,10 @@
 <?php
 
+require ('DbAdapter.php');
+
 class Service
 {
+    protected $dbAdapter;
     protected $dummyData = [
         "tasks" => [
             [
@@ -42,6 +45,11 @@ class Service
             ]
         ]
     ];
+    
+    public function __construct()
+    {
+        $this->dbAdapter = new DbAdapter();
+    }
     
     public function getAll()
     {
