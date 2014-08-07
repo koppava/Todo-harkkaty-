@@ -37,7 +37,8 @@ table.tablesorter tbody td {
 }
 
 .add-todo {
-    margin-top: 45px;
+    margin-top: 20px;
+    margin-bottom: 5px;
 }
 
 .radio-container {

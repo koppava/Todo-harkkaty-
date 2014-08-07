@@ -16,9 +16,16 @@ class DbAdapter extends PDO
         parent::__construct($dsn, $username, $password, $options);
     }
     
-    private function prepareInsertSql($data)
+    private function getTableName(&$data)
     {
-        $sql = 'INSERT INTO task (';
+        $tableName = $data['entity'];
+        unset($data['entity']);
+        return $tableName;
+    }
+    
+    private function prepareInsertSql(&$data)
+    {
+        $sql = 'INSERT INTO ' . $this->getTableName($data) . ' (';
         
         $columns = array_keys($data);
         foreach ($columns as $column) {
@@ -42,9 +49,9 @@ class DbAdapter extends PDO
         return $sql;
     }
     
-    private function prepareUpdateSql($data)
+    private function prepareUpdateSql(&$data)
     {
-        $sql = 'UPDATE task SET ';
+        $sql = 'UPDATE ' . $this->getTableName($data) . ' SET ';
         
         $columns = array_keys($data);
         foreach ($columns as $column) {
@@ -88,9 +95,16 @@ class DbAdapter extends PDO
         }
     }
     
-    public function fetchAll()
+    public function fetchAllTasks()
     {
         $statement = $this->prepare("SELECT * FROM task;");
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+    
+    public function fetchAllAssignees()
+    {
+        $statement = $this->prepare("SELECT * FROM assignee;");
         $statement->execute();
         return $statement->fetchAll();
     }
