@@ -16,6 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `assignee`
+--
+
+DROP TABLE IF EXISTS `assignee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assignee` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) COLLATE utf8mb4_swedish_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assignee`
+--
+
+LOCK TABLES `assignee` WRITE;
+/*!40000 ALTER TABLE `assignee` DISABLE KEYS */;
+INSERT INTO `assignee` VALUES (1,'Koppava'),(2,'Duude'),(3,'Hank'),(4,'Another');
+/*!40000 ALTER TABLE `assignee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `task`
 --
 
@@ -25,12 +49,22 @@ DROP TABLE IF EXISTS `task`;
 CREATE TABLE `task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `task_name` varchar(256) COLLATE utf8mb4_swedish_ci NOT NULL,
-  `assignee` varchar(64) COLLATE utf8mb4_swedish_ci DEFAULT '',
+  `assignee` int(11) NOT NULL DEFAULT '0',
   `deadline` date NOT NULL,
-  `done` tinyint(1) DEFAULT NULL,
+  `done` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `task`
+--
+
+LOCK TABLES `task` WRITE;
+/*!40000 ALTER TABLE `task` DISABLE KEYS */;
+INSERT INTO `task` VALUES (1,'asdads',0,'2010-01-01',0),(2,'Another task',0,'2013-01-01',1),(3,'Another tas',0,'2012-12-12',1),(4,'Task2',0,'2001-01-01',0),(5,'Task3',0,'2001-01-01',0);
+/*!40000 ALTER TABLE `task` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -41,4 +75,4 @@ CREATE TABLE `task` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-07 18:09:25
+-- Dump completed on 2014-08-07 21:00:10
