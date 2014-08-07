@@ -21,23 +21,38 @@
 
 <div id="result"></div>
     
-<script id="theTmpl" type="text/x-jsrender">
+<script id="tableRows" type="text/x-jsrender">
 {{for tasks}}
-    <tr class="{{if done == 1}}done{{else}}unfinished{{/if}}">
+    <tr class="{{if done == 1}}done{{else}}unfinished{{/if}}" data-id="{{:id}}">
         <td>{{:task_name}}</td>\n\
-        <td>{{:assignee}}</td>\n\
+        <td class="assignee-column">{{:assignee}}</td>\n\
         <td>{{:deadline}}</td>\n\
         <td class="status">
             {{if done == 1}}
-                <button data-id="{{:id}}" data-done="1" class="status btn-xs btn-success">Done</button>
+                <button data-done="1" class="status btn-xs btn-success">Done</button>
             {{else}}
-                <button data-id="{{:id}}" data-done="0" class="status btn-xs btn-danger">Unfinished</button>
+                <button data-done="0" class="status btn-xs btn-danger">Unfinished</button>
             {{/if}}
         </td>
         <td><button class="btn-xs btn-primary">Edit</button><button class="btn-xs btn-warning">Delete</button></td>
     </tr>
 {{/for}}
 </script>
+
+<script id="assignees" type="text/x-jsrender">
+<div class="btn-group pull-right">
+    <button type="button" class="btn-xs btn-primary dropdown-toggle" data-toggle="dropdown">
+      Change <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li><a class="assign" data-assignee="0" href="#">Unassign</a></li>
+        <li class="divider"></li>
+        {{for assignees}}
+            <li><a class="assign" data-assignee="{{:id}}" href="#">{{:name}}</a></li>
+        {{/for}}
+    </ul>
+</div>
+</script>                    
 
 <div class="modal fade todo-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -84,6 +99,7 @@
     <button class="add-todo btn btn-primary" data-toggle="modal" data-target=".todo-modal">Add ToDo item</button>
     <button class="add-assignee btn btn-primary" data-toggle="modal" data-target=".assignee-modal">Add Assignee</button>
 </div>
+
 <div class="col-xs-5">
     <p>The ToDo list now initially sorts by assignee name (from unassigned to ascending aplhabetic order) and dealine (soonest first).</p>
     <p><b>Next feature: Adding assignees from a list of persisted assignees</b></p>
@@ -104,12 +120,13 @@
 </table>
 
 <script>
-    var template = $.templates("#theTmpl");
+    var tableRows = $.templates('#tableRows');
+    var changeAssignees = $.templates('#assignees');
     
     function updateTable(filter)
     {
         $.getJSON('index.php', function(data){
-            $('#todo-table-content').html(template.render(data));
+            $('#todo-table-content').html(tableRows.render(data));
             
             // For some reasone sorting does not work with dynamic row addition
             //$('.tablesorter').trigger('update');
@@ -124,7 +141,24 @@
                     sortList       : [[1,0],[2, 0]]
                 });
             
+            parseAssignees(data);            
             filter();
+        });
+    }
+    
+    function parseAssignees(data)
+    {
+        var changeAssigneeHtml = changeAssignees.render(data);
+        $('.assignee-column').each(function() {
+            var assigneeId = $(this).html();
+            $(this).html('');
+            for (index in data.assignees) {
+                if (data.assignees[index].id === assigneeId) {
+                    $(this).html(data.assignees[index].name);
+                }
+            }
+
+            $(this).append(changeAssigneeHtml);
         });
     }
     
@@ -136,6 +170,9 @@
         $('.unfinished').each(function(){
             $(this).hide();
         });
+        
+        $('#show-done').attr('checked', 'checked');
+        $('#show-unfinished').removeAttr('checked');
     }
     
     function showUnfinished()
@@ -146,6 +183,19 @@
         $('.done').each(function(){
             $(this).hide();
         });
+        
+        $('#show-done').removeAttr('checked');
+        $('#show-unfinished').attr('checked', 'checked');
+    }
+    
+    function showCurrent()
+    {
+        if ($('#show-done').is(':checked')) {
+            showDone();
+        }
+        if ($('#show-unfinished').is(':checked')) {
+            showUnfinished();
+        }
     }
     
     updateTable(showDone);
@@ -160,7 +210,6 @@
     
     $('body').on('click', '.save', function() {
         var submitData = {};
-        console.log("Here");
         $(this).parent('.modal-body').children('input').each(function(){
             if ($(this).data('column')) {
                 submitData[$(this).data('column')] = $(this).val();
@@ -189,7 +238,7 @@
         event.stopImmediatePropagation();
         var show = showDone;
         var data = {};
-        data.id = $(this).data('id');
+        data.id = $(this).closest('tr').data('id');
         data.entity = 'task';
         
         if ($(this).data('done') == 0) {
@@ -210,6 +259,24 @@
             data: data,
             success: function() {
                 updateTable(show);
+            }
+        });
+    });
+    
+    $('body').on('click', '.assign', function(event) {
+        var data = {};
+        data.id = $(this).closest('tr').data('id');
+        data.assignee = $(this).data('assignee');
+        data.entity = 'task';
+        
+        console.log(data);
+        $.ajax({
+            type: 'PUT',
+            url: 'index.php',
+            contentType: 'application/json',
+            data: data,
+            success: function() {
+                updateTable(showCurrent);
             }
         });
     });
