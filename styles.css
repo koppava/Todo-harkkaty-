@@ -31,3 +31,7 @@ table.tablesorter tbody td {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.status {
+    text-align: center;
+}

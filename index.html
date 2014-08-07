@@ -27,7 +27,13 @@
         <td>{{:task_name}}</td>\n\
         <td>{{:assignee}}</td>\n\
         <td>{{:deadline}}</td>\n\
-        <td>{{if done == 1}}<span class="green">Done</span>{{else}}<span class="red">Unfinished</span>{{/if}}</td>
+        <td class="status">
+            {{if done == 1}}
+                <button class="btn btn-success">Done</button>
+            {{else}}
+                <button class="btn btn-danger">Unfinished</button>
+            {{/if}}
+        </td>
         <td><button class="btn btn-primary">Edit</button><button class="btn btn-warning">Delete</button></td>
     </tr>
 {{/for}}
