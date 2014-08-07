@@ -17,7 +17,13 @@ class Service
 
     public function getAll()
     {
-        return ["tasks" => $this->dbAdapter->fetchAll()];
+        $data = ["tasks" => $this->dbAdapter->fetchAll()];
+        foreach ($data as $key => $value) {
+            if ($key == 'deadline') {
+                $data[$key] = DateTime::createFromFormat('Y-m-d', $value)->format('d-m-Y');
+            }
+        }
+        return $data;
     }
     
     public function persistRequestData($data)

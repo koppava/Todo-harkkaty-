@@ -35,3 +35,13 @@ table.tablesorter tbody td {
 .status {
     text-align: center;
 }
+
+.add-todo {
+    margin-top: 45px;
+}
+
+.radio-container {
+    clear: left;
+    float: left;
+    margin-left: 10px;
+}
