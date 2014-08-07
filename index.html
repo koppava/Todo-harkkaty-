@@ -39,7 +39,7 @@
 {{/for}}
 </script>
 
-<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+<div class="modal fade todo-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content row">
             <div class="modal-header">
@@ -48,11 +48,27 @@
             </div>
             <div class="modal-body">
                 <label for="task-name" class="col-xs-6">Task Name:</label>
-                <input id="task-name" class="col-xs-5" type="text" />
-                <label for="assignee" class="col-xs-6">Assignee:</label>
-                <input id="assignee" class="col-xs-5" type="text" />
+                <input id="task-name" data-column="task_name" class="col-xs-5" type="text" />
                 <label for="deadline" class="col-xs-6">Deadline:</label>
-                <input id="deadline" class="col-xs-5" type="text" placeholder="e.g. 07-08-2014" />
+                <input id="deadline" data-column="deadline" class="col-xs-5" type="text" placeholder="e.g. 07-08-2014" />
+                <input type="hidden" name="entity" value="task" />
+                <button class="save btn btn-primary pull-right">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade assignee-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content row">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add Assignee</h4>
+            </div>
+            <div class="modal-body">
+                <label for="assignee-name" class="col-xs-6">Name:</label>
+                <input id="assignee-name" data-column="name" class="col-xs-5" type="text" />
+                <input type="hidden" name="entity" value="assignee" />
                 <button class="save btn btn-primary pull-right">Save</button>
             </div>
         </div>
@@ -65,7 +81,8 @@
     <span class="radio-container"><input id="show-unfinished" name="show" type="radio" /> <label for="show-unfinished">Unfinished</label></span>
 </div>
 <div class="col-xs-3">
-    <button class="add-todo btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Add ToDo item</button>
+    <button class="add-todo btn btn-primary" data-toggle="modal" data-target=".todo-modal">Add ToDo item</button>
+    <button class="add-assignee btn btn-primary" data-toggle="modal" data-target=".assignee-modal">Add Assignee</button>
 </div>
 <div class="col-xs-5">
     <p>The ToDo list now initially sorts by assignee name (from unassigned to ascending aplhabetic order) and dealine (soonest first).</p>
@@ -89,7 +106,7 @@
 <script>
     var template = $.templates("#theTmpl");
     
-    function updateTable(initial, filter)
+    function updateTable(filter)
     {
         $.getJSON('index.php', function(data){
             $('#todo-table-content').html(template.render(data));
@@ -131,7 +148,7 @@
         });
     }
     
-    updateTable(true, showDone);
+    updateTable(showDone);
     
     $('#show-done').on('click', function() {
         showDone();
@@ -142,15 +159,22 @@
     })
     
     $('body').on('click', '.save', function() {
+        var submitData = {};
+        console.log("Here");
+        $(this).parent('.modal-body').children('input').each(function(){
+            if ($(this).data('column')) {
+                submitData[$(this).data('column')] = $(this).val();
+            }
+            if ($(this).attr('name') == 'entity') {
+                submitData.entity = $(this).val();
+            }
+        });
+        
         $.post(
             'index.php', 
-            {
-                'task_name': $('#task-name').val(),
-                'assignee': $('#assignee').val(),
-                'deadline': $('#deadline').val()
-            },
-            function (data) {
-                updateTable(false, showUnfinished);
+            submitData,
+            function () {
+                updateTable(showUnfinished);
                 
                 $('.modal').modal('hide');
                 $('#task-name').val('');
@@ -166,6 +190,8 @@
         var show = showDone;
         var data = {};
         data.id = $(this).data('id');
+        data.entity = 'task';
+        
         if ($(this).data('done') == 0) {
             data.done = 1;
         }
@@ -183,7 +209,7 @@
             contentType: 'application/json',
             data: data,
             success: function() {
-                updateTable(false, show);
+                updateTable(show);
             }
         });
     });
