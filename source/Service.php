@@ -17,7 +17,8 @@ class Service
 
     public function getAll()
     {
-        $data = ["tasks" => $this->dbAdapter->fetchAll()];
+        $data = ["tasks" => $this->dbAdapter->fetchAllTasks()];
+        $data['assignees'] = $this->dbAdapter->fetchAllAssignees();
         return $data;
     }
     

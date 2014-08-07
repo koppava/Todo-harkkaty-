@@ -95,9 +95,16 @@ class DbAdapter extends PDO
         }
     }
     
-    public function fetchAll()
+    public function fetchAllTasks()
     {
         $statement = $this->prepare("SELECT * FROM task;");
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+    
+    public function fetchAllAssignees()
+    {
+        $statement = $this->prepare("SELECT * FROM assignee;");
         $statement->execute();
         return $statement->fetchAll();
     }
