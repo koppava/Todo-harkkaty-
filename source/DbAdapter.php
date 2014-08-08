@@ -75,16 +75,18 @@ class DbAdapter extends PDO
         return $statement;
     }
     
-    public function insertTask($data)
+    public function insert($data)
     {
         $statement = $this->prepare($this->prepareInsertSql($data));
         
         $this->bindData($statement, $data);
         
-        $statement->execute();
+        if ($statement->execute() === false) {
+            var_dump($statement->errorInfo());
+        }
     }
     
-    public function updateTask($id, $data)
+    public function update($id, $data)
     {
         $statement = $this->prepare($this->prepareUpdateSql($data));
         $statement->bindParam(':id', $id);

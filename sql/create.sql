@@ -40,6 +40,56 @@ INSERT INTO `assignee` VALUES (1,'Koppava'),(2,'Duude'),(3,'Hank'),(4,'Another')
 UNLOCK TABLES;
 
 --
+-- Table structure for table `assignment`
+--
+
+DROP TABLE IF EXISTS `assignment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `assignment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_id` int(11) NOT NULL,
+  `assignee_id` int(11) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `assignment`
+--
+
+LOCK TABLES `assignment` WRITE;
+/*!40000 ALTER TABLE `assignment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `assignment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `status_change`
+--
+
+DROP TABLE IF EXISTS `status_change`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `status_change` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_id` int(11) NOT NULL,
+  `status` tinyint(1) NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_swedish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `status_change`
+--
+
+LOCK TABLES `status_change` WRITE;
+/*!40000 ALTER TABLE `status_change` DISABLE KEYS */;
+/*!40000 ALTER TABLE `status_change` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `task`
 --
 
@@ -49,7 +99,7 @@ DROP TABLE IF EXISTS `task`;
 CREATE TABLE `task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `task_name` varchar(256) COLLATE utf8mb4_swedish_ci NOT NULL,
-  `assignee` int(11) NOT NULL DEFAULT '0',
+  `assignee_id` int(11) NOT NULL DEFAULT '0',
   `deadline` date NOT NULL,
   `done` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -62,7 +112,7 @@ CREATE TABLE `task` (
 
 LOCK TABLES `task` WRITE;
 /*!40000 ALTER TABLE `task` DISABLE KEYS */;
-INSERT INTO `task` VALUES (1,'asdads',0,'2010-01-01',0),(2,'Another task',0,'2013-01-01',1),(3,'Another tas',0,'2012-12-12',1),(4,'Task2',0,'2001-01-01',0),(5,'Task3',0,'2001-01-01',0);
+INSERT INTO `task` VALUES (1,'asdads',0,'2010-01-01',0),(2,'Another task',1,'2013-01-01',1),(3,'Another tas',0,'2012-12-12',1),(4,'Task2',0,'2001-01-01',0),(5,'Task3',3,'2001-01-01',0);
 /*!40000 ALTER TABLE `task` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -75,4 +125,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-07 21:00:10
+-- Dump completed on 2014-08-08 12:48:01

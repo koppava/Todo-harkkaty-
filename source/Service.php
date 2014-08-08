@@ -1,6 +1,7 @@
 <?php
 
 require ('DbAdapter.php');
+require ('history/HistoryRecorder.php');
 
 class Service
 {
@@ -26,7 +27,7 @@ class Service
     {
         $data = $this->filterData($data);
         
-        $this->dbAdapter->insertTask($data);
+        $this->dbAdapter->insert($data);
     }
     
     public function saveData($data)
@@ -35,7 +36,9 @@ class Service
         
         $id = $data['id'];
         unset($data['id']);
-        $this->dbAdapter->updateTask($id, $data);
+        $this->dbAdapter->update($id, $data);
+        
+        $this->recordHistory($id, $data);
     }
     
     private function filterData($data)
@@ -50,5 +53,11 @@ class Service
         }
         
         return $data;
+    }
+    
+    private function recordHistory($id, $data)
+    {
+        $historyRecorder = new HistoryRecorder($data, $id);
+        $historyRecorder->saveHistory($this->dbAdapter);
     }
 }
