@@ -1,7 +1,7 @@
 <?php
 
 require ('DbAdapter.php');
-require ('history/HistoryRecorder.php');
+require ('history/HistoryManager.php');
 
 class Service
 {
@@ -16,11 +16,17 @@ class Service
         $this->dbAdapter = new DbAdapter();
     }
 
-    public function getAll()
+    public function getAllTasks()
     {
-        $data = ["tasks" => $this->dbAdapter->fetchAllTasks()];
+        $data = ["tasks" => $this->dbAdapter->fetchTasks()];
         $data['assignees'] = $this->dbAdapter->fetchAllAssignees();
         return $data;
+    }
+    
+    public function getTask($id)
+    {
+        $historyManager = new HistoryManager($id, $this->dbAdapter);
+        return $historyManager->fetchHistory();
     }
     
     public function persistRequestData($data)
@@ -57,7 +63,7 @@ class Service
     
     private function recordHistory($id, $data)
     {
-        $historyRecorder = new HistoryRecorder($data, $id);
-        $historyRecorder->saveHistory($this->dbAdapter);
+        $historyManager = new HistoryManager($id, $this->dbAdapter);
+        $historyManager->saveHistory($data);
     }
 }

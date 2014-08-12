@@ -18,25 +18,33 @@ class Controller
     {
         $response = array();
         if ($request['REQUEST_METHOD'] == 'GET') {
-            $response = $this->service->getAll();
+            $data = $this->parseQueryData($_SERVER['QUERY_STRING']);
+            if (isset($data['task'])) {
+                $response = $this->service->getTask($data['task']);
+            }
+            else {
+                $response = $this->service->getAllTasks();
+            }
         }
         if ($request['REQUEST_METHOD'] == 'POST') {
             $this->service->persistRequestData($_POST);
         }
         if ($request['REQUEST_METHOD'] == 'PUT') {
-            $this->service->saveData($this->parsePutData(file_get_contents("php://input")));
+            $this->service->saveData($this->parseQueryData(file_get_contents("php://input")));
         }
         
         echo json_encode($response);
     }
     
-    private function parsePutData($streamData)
+    private function parseQueryData($input)
     {
         $dataArr = [];
-        $fields = explode('&', $streamData);
+        $fields = explode('&', $input);
         foreach ($fields as $field) {
             $data = explode('=', $field);
-            $dataArr[$data[0]] = $data[1];
+            if (count($data) == 2) {
+                $dataArr[$data[0]] = $data[1];
+            }
         }
         return $dataArr;
     }
