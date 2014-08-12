@@ -97,9 +97,13 @@ class DbAdapter extends PDO
         }
     }
     
-    public function fetchAllTasks()
+    public function fetchTasks($id = null)
     {
         $statement = $this->prepare("SELECT * FROM task;");
+        if ($id) {
+            $statement = $this->prepare("SELECT * FROM task WHERE id=:id");
+            $statement->bindParam(':id', $id);
+        }
         $statement->execute();
         return $statement->fetchAll();
     }
@@ -107,6 +111,22 @@ class DbAdapter extends PDO
     public function fetchAllAssignees()
     {
         $statement = $this->prepare("SELECT * FROM assignee;");
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+    
+    public function fetchAssignments($taskId)
+    {
+        $statement = $this->prepare("SELECT * FROM assignment WHERE task_id=:task_id");
+        $statement->bindParam(':task_id', $taskId);
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+    
+    public function fetchStatusChanges($taskId)
+    {
+        $statement = $this->prepare("SELECT * FROM status_change WHERE task_id=:task_id");
+        $statement->bindParam(':task_id', $taskId);
         $statement->execute();
         return $statement->fetchAll();
     }

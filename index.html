@@ -24,9 +24,9 @@
 <script id="tableRows" type="text/x-jsrender">
 {{for tasks}}
     <tr class="{{if status == 1}}done{{else}}unfinished{{/if}}" data-id="{{:id}}">
-        <td>{{:task_name}}</td>\n\
-        <td class="assignee-column">{{:assignee_id}}</td>\n\
-        <td>{{:deadline}}</td>\n\
+        <td><a class="task-history" data-toggle="modal" data-target=".history-modal">{{:task_name}}</a></td>
+        <td class="assignee-column">{{:assignee_id}}</td>
+        <td>{{:deadline}}</td>
         <td class="status">
             {{if status == 1}}
                 <button data-status="1" class="status btn-xs btn-success">Done</button>
@@ -52,7 +52,14 @@
         {{/for}}
     </ul>
 </div>
-</script>                    
+</script>
+
+<script id="assignment-template" type="text/x-jsrender">
+    <span class="col-xs-12">Task has been {{if name == ''}}unassigned{{else}}assigned for {{:name}}{{/if}} <span class="pull-right">{{:time}}</span></span>
+</script>
+<script id="status-change-template" type="text/x-jsrender">
+    <span class="col-xs-12">Task status has been set to  {{if status == 1}}done{{else}}unfinished{{/if}} <span class="pull-right">{{:time}}</span></span>
+</script>
 
 <div class="modal fade task-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-m">
@@ -71,7 +78,6 @@
                     <input id="deadline" data-column="deadline" class="col-xs-4" type="text" placeholder="e.g. 07-08-2014" />
                     <input type="hidden" name="entity" value="task" />
                     <button class="save btn btn-primary pull-right">Save</button>
-                    
                 </span>
             </div>
         </div>
@@ -79,19 +85,32 @@
 </div>
 
 <div class="modal fade assignee-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-m">
+    <div class="modal-dialog modal-sm">
         <div class="modal-content row">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title">Add Assignee</h4>
             </div>
             <div class="modal-body">
-                <span class="col-xs-12">
-                    <label for="assignee-name" class="col-xs-3">Name:</label>
-                    <input id="assignee-name" data-column="name" class="col-xs-6" type="text" />
-                    <input type="hidden" name="entity" value="assignee" />
-                    <button class="save btn btn-primary pull-right">Save</button>
-                </span>
+                <label for="assignee-name" class="col-xs-6">Name:</label>
+                <input id="assignee-name" data-column="name" class="col-xs-5" type="text" />
+                <input type="hidden" name="entity" value="assignee" />
+                <button class="save btn btn-primary pull-right">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade history-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-m">
+        <div id="task-history" class="modal-content row">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+                <h5>History</h5>
+                <div class="history-container"></div>
             </div>
         </div>
     </div>
@@ -129,6 +148,9 @@
 <script>
     var tableRows = $.templates('#tableRows');
     var changeAssignees = $.templates('#assignees');
+    var assignmentTemplate = $.templates('#assignment-template');
+    var statusUpdateTemplate = $.templates('#status-change-template');
+    
     
     function updateTable(filter)
     {
@@ -153,9 +175,26 @@
         });
     }
     
+    function getTaskDetails(id)
+    {
+        $.getJSON('index.php?task=' + id, function(data){
+            var historyContainer = $('.history-modal .history-container');
+            var historyData = data.history;
+            historyContainer.html('');
+            $('.history-modal .modal-title').html(data.task[0].task_name);
+            for (index in historyData) {
+                if (historyData[index].status_change !== undefined) {
+                    historyContainer.append(statusUpdateTemplate.render(historyData[index].status_change));
+                }
+                if (historyData[index].assignment !== undefined) {
+                    historyContainer.append(assignmentTemplate.render(historyData[index].assignment));
+                }
+            }
+        });
+    }
+    
     function parseAssignees(data)
     {
-        var changeAssigneeHtml = changeAssignees.render(data);
         $('.assignee-column').each(function() {
             var assigneeId = $(this).html();
             $(this).html('');
@@ -165,7 +204,7 @@
                 }
             }
 
-            $(this).append(changeAssigneeHtml);
+            $(this).append(changeAssignees.render(data));
         });
     }
     
@@ -206,6 +245,10 @@
     }
     
     updateTable(showDone);
+    
+    $('.history-modal').on('show.bs.modal', function(event) {
+        getTaskDetails($(event.relatedTarget).closest('tr').data('id'));
+    });
     
     $('#show-done').on('click', function() {
         showDone();
